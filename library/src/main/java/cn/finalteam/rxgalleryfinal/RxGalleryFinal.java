@@ -136,6 +136,11 @@ public class RxGalleryFinal {
         return this;
     }
 
+    public RxGalleryFinal imageLoaderRawType(int type) {
+        configuration.setImageLoaderType(type);
+        return this;
+    }
+
     /**
      * 隐藏相机
      */

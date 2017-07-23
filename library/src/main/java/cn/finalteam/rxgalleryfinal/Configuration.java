@@ -171,24 +171,8 @@ public class Configuration implements Parcelable {
     }
 
     public AbsImageLoader getImageLoader() {
-        AbsImageLoader imageLoader = null;
-        switch (imageLoaderType) {
-            case 1:
-                imageLoader = new PicassoImageLoader();
-                break;
-            case 2:
-                imageLoader = new GlideImageLoader();
-                break;
-            case 3:
-                imageLoader = new FrescoImageLoader();
-                break;
-            case 4:
-                imageLoader = new UniversalImageLoader();
-                break;
-            case 5:
-
-                break;
-        }
+        AbsImageLoader imageLoader;
+        imageLoader = ImageLoadFactory.getInstance().getImageLoader(imageLoaderType);
         return imageLoader;
     }
 
