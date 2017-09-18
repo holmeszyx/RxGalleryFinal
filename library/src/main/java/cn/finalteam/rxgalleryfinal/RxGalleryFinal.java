@@ -66,6 +66,16 @@ public class RxGalleryFinal {
         return this;
     }
 
+    public RxGalleryFinal hidePreview() {
+        configuration.setHidePreview(true);
+        return this;
+    }
+
+    public RxGalleryFinal videoPreview() {
+        configuration.setVideoPreview(true);
+        return this;
+    }
+
     public RxGalleryFinal gif(boolean flag) {
         configuration.setPlayGif(flag);
         return this;

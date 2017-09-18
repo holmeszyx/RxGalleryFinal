@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -97,6 +98,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     //裁剪后+name
     private static File mCropPath = null;
     private final String IMAGE_STORE_FILE_NAME = "IMG_%s.jpg";
+    private final String VIDEO_STORE_FILE_NAME = "IMG_%s.mp4";
     private final int TAKE_IMAGE_REQUEST_CODE = 1001;
     private final int CROP_IMAGE_REQUEST_CODE = 1011;
     private final String TAKE_URL_STORAGE_KEY = "take_url_storage_key";
@@ -135,6 +137,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     private int uCropActivityWidgetColor;
     private int uCropToolbarWidgetColor;
     private String uCropTitle;
+    private String requestStorageAccessPermissionTips;
 
     public static MediaGridFragment newInstance(Configuration configuration) {
         MediaGridFragment fragment = new MediaGridFragment();
@@ -178,7 +181,6 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
      */
     public static void setImageStoreDir(String imgFile) {
         mImageStoreDir = new File(Environment.getExternalStorageDirectory(), "/DCIM" + File.separator + imgFile + File.separator);
-        ;
         Logger.i("设置图片保存路径为：" + mImageStoreDir.getAbsolutePath());
     }
 
@@ -267,6 +269,15 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         if (mConfiguration.isRadio()) {
             view.findViewById(R.id.tv_preview_vr).setVisibility(View.GONE);
             mTvPreview.setVisibility(View.GONE);
+
+        } else {
+            if (mConfiguration.isHidePreview()) {
+                view.findViewById(R.id.tv_preview_vr).setVisibility(View.GONE);
+                mTvPreview.setVisibility(View.GONE);
+            } else {
+                view.findViewById(R.id.tv_preview_vr).setVisibility(View.VISIBLE);
+                mTvPreview.setVisibility(View.VISIBLE);
+            }
         }
 
         mMediaBeanList = new ArrayList<>();
@@ -324,6 +335,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
             mMediaGridPresenter.getMediaList(mBucketId, mPage, LIMIT);
         }
 
+
     }
 
     /**
@@ -357,10 +369,16 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 .subscribeWith(new RxBusDisposable<RequestStorageReadAccessPermissionEvent>() {
                     @Override
                     protected void onEvent(RequestStorageReadAccessPermissionEvent requestStorageReadAccessPermissionEvent) throws Exception {
-                        if (requestStorageReadAccessPermissionEvent.isSuccess()) {
-                            mMediaGridPresenter.getMediaList(mBucketId, mPage, LIMIT);
+                        if (requestStorageReadAccessPermissionEvent.getType() == RequestStorageReadAccessPermissionEvent.TYPE_WRITE) {
+                            if (requestStorageReadAccessPermissionEvent.isSuccess()) {
+                                mMediaGridPresenter.getMediaList(mBucketId, mPage, LIMIT);
+                            } else {
+                                getActivity().finish();
+                            }
                         } else {
-                            getActivity().finish();
+                            if (requestStorageReadAccessPermissionEvent.isSuccess()) {
+                                openCamera(mMediaActivity);
+                            }
                         }
                     }
                 });
@@ -381,6 +399,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         uCropTitle = ThemeUtils.resolveString(getActivity(), R.attr.gallery_ucrop_toolbar_title, R.string.gallery_edit_phote);
         int pageColor = ThemeUtils.resolveColor(getContext(), R.attr.gallery_page_bg, R.color.gallery_default_page_bg);
         mRlRootView.setBackgroundColor(pageColor);
+        requestStorageAccessPermissionTips = ThemeUtils.resolveString(getContext(), R.attr.gallery_request_camera_permission_tips, R.string.gallery_default_camera_access_permission_tips);
     }
 
     @Override
@@ -481,12 +500,18 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 Toast.makeText(getContext(), R.string.gallery_device_no_camera_tips, Toast.LENGTH_SHORT).show();
                 return;
             }
-            //打开
-            openCamera(getActivity());
 
+            boolean b = PermissionCheckUtils.checkCameraPermission(mMediaActivity, requestStorageAccessPermissionTips, MediaActivity.REQUEST_CAMERA_ACCESS_PERMISSION);
+            if (b) {
+                openCamera(mMediaActivity);
+            }
         } else {
             if (mConfiguration.isRadio()) {
-                radioNext(mediaBean);
+                if (mConfiguration.isImage()) {
+                    radioNext(mediaBean);
+                } else {
+                    videoRadioNext(mediaBean);
+                }
             } else {
                 MediaBean firstBean = mMediaBeanList.get(0);
                 ArrayList<MediaBean> gridMediaList = new ArrayList<>();
@@ -500,6 +525,26 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 }
                 RxBus.getDefault().post(new OpenMediaPageFragmentEvent(gridMediaList, pos));
             }
+        }
+    }
+
+    /**
+     * 处理 Video  选择  是否预览
+     *
+     * @param mediaBean
+     */
+    private void videoRadioNext(MediaBean mediaBean) {
+        if (!mConfiguration.isVideoPreview()) {
+            setPostMediaBean(mediaBean);
+            getActivity().finish();
+            return;
+        }
+        try {
+            Intent openVideo = new Intent(Intent.ACTION_VIEW);
+            openVideo.setDataAndType(Uri.parse(mediaBean.getOriginalPath()), "video/*");
+            startActivity(openVideo);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "启动播放器失败", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -589,28 +634,33 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     }
 
     public void openCamera(Context context) {
-        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (captureIntent.resolveActivity(context.getPackageManager()) != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
-            String filename = String.format(IMAGE_STORE_FILE_NAME, dateFormat.format(new Date()));
-            Logger.i("openCamera：" + mImageStoreDir.getAbsolutePath());
-            File fileImagePath = new File(mImageStoreDir, filename);
-            mImagePath = fileImagePath.getAbsolutePath();
-            /*获取当前系统的android版本号*/
-            int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-            if (currentapiVersion < 24) {
-                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileImagePath));
-                startActivityForResult(captureIntent, TAKE_IMAGE_REQUEST_CODE);
-            } else {
-                ContentValues contentValues = new ContentValues(1);
-                contentValues.put(MediaStore.Images.Media.DATA, mImagePath);
-                Uri uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                startActivityForResult(captureIntent, TAKE_IMAGE_REQUEST_CODE);
-            }
-        } else {
+
+
+        boolean image = mConfiguration.isImage();
+
+        Intent captureIntent = image ? new Intent(MediaStore.ACTION_IMAGE_CAPTURE) : new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (captureIntent.resolveActivity(context.getPackageManager()) == null) {
             Toast.makeText(getContext(), R.string.gallery_device_camera_unable, Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
+        String filename = String.format(image ? IMAGE_STORE_FILE_NAME : VIDEO_STORE_FILE_NAME, dateFormat.format(new Date()));
+        Logger.i("openCamera：" + mImageStoreDir.getAbsolutePath());
+        File fileImagePath = new File(mImageStoreDir, filename);
+        mImagePath = fileImagePath.getAbsolutePath();
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileImagePath));
+        } else {
+            ContentValues contentValues = new ContentValues(1);
+            contentValues.put(MediaStore.Images.Media.DATA, mImagePath);
+            Uri uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+        // video : 1: 高质量  0 低质量
+//        captureIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        startActivityForResult(captureIntent, TAKE_IMAGE_REQUEST_CODE);
     }
 
     @Override
@@ -619,12 +669,13 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         Logger.i("onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
         if (requestCode == TAKE_IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Logger.i(String.format("拍照成功,图片存储路径:%s", mImagePath));
-            //刷新相册数据库
-            mMediaScanner.scanFile(mImagePath, IMAGE_TYPE, this);
+            mMediaScanner.scanFile(mImagePath, mConfiguration.isImage() ? IMAGE_TYPE : "", this);
+        } else if (requestCode == 222) {
+            Toast.makeText(getActivity(), "摄像成功", Toast.LENGTH_SHORT).show();
         } else if (requestCode == CROP_IMAGE_REQUEST_CODE && data != null) {
             Logger.i("裁剪成功");
             refreshUI();
-            onCropFinished(data);
+            onCropFinished();
         }
     }
 
@@ -636,11 +687,9 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
      * .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_WIDTH, imageWidth)
      * .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
      */
-    private void onCropFinished(Intent data) {
+    private void onCropFinished() {
         if (iListenerRadio != null && mCropPath != null) {
             if (mConfiguration.isCrop()) {
-                Uri outputUri = data.getParcelableExtra(UCrop.EXTRA_OUTPUT_URI);
-                Logger.i("# crop image is #" + outputUri.getPath());
                 iListenerRadio.cropAfter(mCropPath);
             }
         } else {
@@ -768,8 +817,12 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
             return;
         }
 
+        // mediaBean 有可能为Null，onNext 做了处理，在 getMediaBeanWithImage 时候就不处理Null了
         Observable.create((ObservableOnSubscribe<MediaBean>) subscriber -> {
-            MediaBean mediaBean = MediaUtils.getMediaBeanWithImage(getContext(), images[0]);
+            MediaBean mediaBean =
+                    mConfiguration.isImage() ? MediaUtils.getMediaBeanWithImage(getContext(), images[0])
+                            :
+                            MediaUtils.getMediaBeanWithVideo(getContext(), images[0]);
             subscriber.onNext(mediaBean);
             subscriber.onComplete();
         })
@@ -782,7 +835,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
 
                     @Override
                     public void onError(Throwable e) {
-                        Logger.i("获取MediaBean异常");
+                        Logger.i("获取MediaBean异常" + e.toString());
                     }
 
                     @Override

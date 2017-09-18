@@ -13,17 +13,22 @@ import android.widget.Toast;
 
 import com.yalantis.ucrop.model.AspectRatio;
 
+import java.util.List;
+
 import cn.finalteam.rxgalleryfinal.RxGalleryFinal;
 import cn.finalteam.rxgalleryfinal.RxGalleryFinalApi;
+import cn.finalteam.rxgalleryfinal.bean.MediaBean;
 import cn.finalteam.rxgalleryfinal.imageloader.ImageLoaderType;
 import cn.finalteam.rxgalleryfinal.rxbus.RxBusResultDisposable;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageMultipleResultEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 import cn.finalteam.rxgalleryfinal.sample.imageloader.ImageLoaderActivity;
 import cn.finalteam.rxgalleryfinal.ui.RxGalleryListener;
+import cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity;
 import cn.finalteam.rxgalleryfinal.ui.base.IMultiImageCheckedListener;
 import cn.finalteam.rxgalleryfinal.ui.base.IRadioImageCheckedListener;
 import cn.finalteam.rxgalleryfinal.utils.Logger;
+import cn.finalteam.rxgalleryfinal.utils.PermissionCheckUtils;
 
 /**
  * 示例
@@ -192,24 +197,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (mRbMutiIMG.isChecked()) {
             openImageSelectMultiMethod(1);
         } else {
-            RxGalleryFinalApi.openZKCamera(MainActivity.this);
+            if (PermissionCheckUtils.checkCameraPermission(this, "", MediaActivity.REQUEST_CAMERA_ACCESS_PERMISSION)) {
+                RxGalleryFinalApi.openZKCamera(MainActivity.this);
+            }
         }
     }
+
+    private List<MediaBean> list = null;
 
     /**
      * 自定义多选
      */
     private void openMulti() {
-        RxGalleryFinal
+//        RxGalleryFinal.with(this).hidePreview();
+        RxGalleryFinal rxGalleryFinal = RxGalleryFinal
                 .with(MainActivity.this)
                 .image()
-                .multiple()
-                .maxSize(8)
+                .multiple();
+        if (list != null && !list.isEmpty()) {
+            rxGalleryFinal
+                    .selected(list);
+        }
+        rxGalleryFinal.maxSize(8)
                 .imageLoader(ImageLoaderType.FRESCO)
                 .subscribe(new RxBusResultDisposable<ImageMultipleResultEvent>() {
 
                     @Override
                     protected void onEvent(ImageMultipleResultEvent imageMultipleResultEvent) throws Exception {
+                        list = imageMultipleResultEvent.getResult();
                         Toast.makeText(getBaseContext(), "已选择" + imageMultipleResultEvent.getResult().size() + "张图片", Toast.LENGTH_SHORT).show();
                     }
 
@@ -295,12 +310,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 视频单选回调
      */
     private void openVideoSelectRadioMethod() {
-        RxGalleryFinalApi.getInstance(MainActivity.this)
+        RxGalleryFinalApi
+                .getInstance(MainActivity.this)
                 .setType(RxGalleryFinalApi.SelectRXType.TYPE_VIDEO, RxGalleryFinalApi.SelectRXType.TYPE_SELECT_RADIO)
                 .setVDRadioResultEvent(new RxBusResultDisposable<ImageRadioResultEvent>() {
                     @Override
                     protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
-                        //回调还没
+                        Toast.makeText(getApplicationContext(), imageRadioResultEvent.getResult().getOriginalPath(), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .open();

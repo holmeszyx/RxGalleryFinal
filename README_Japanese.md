@@ -1,15 +1,20 @@
 # RxGalleryFinal
 
+##  翻訳
 
-## Functional description（JDK1.8）
+  情報 ：KARL-Dujinyang
+ <br/> 情報 ： 杜锦阳 - [sheep0704](https://github.com/sheep0704)
 
-   RxGalleryFinal is an android image/video file selector.Its support for multiple, radio, film and cutting, the theme can be custom, no mandatory binding third-party image loader.
+## の機能的な記述（JDK1.8）
+
+   rxgalleryfinal android画像/ビデオファイルセレクタ。複数の無線のための支援を、フィルムと切断できるカスタムテーマは、義務的な結合のサードパーティのイメージでない。
+
 
    * [English](https://github.com/FinalTeam/RxGalleryFinal/blob/master/README_English.md)
    * [Japanese](https://github.com/FinalTeam/RxGalleryFinal/blob/master/README_Japanese.md)
    * [Chinese](https://github.com/FinalTeam/RxGalleryFinal)
 
-## Version described
+## 版について
 
 [History Issues](https://github.com/FinalTeam/RxGalleryFinal/wiki/RxGalleryFinal-Issues)
 
@@ -17,43 +22,38 @@
 
 ### To be perfect
 
-    1.Video of the callback
-    2.Caton test, search in Issues: [fine] feel the point of Caton, I #130
+    1つのコールバックのビデオ。
+    2ケイトン試験においては、問題の探索：細かい点のケイトン感じます、私は130
 
 
 ### gradle
 
-	   New : compile 'cn.finalteam.rxgalleryfinal:library:1.1.3' -> Emergency repair bug.
-	  (Fix #191, add video)
+	   New : compile 'cn.finalteam.rxgalleryfinal:library:1.1.3' -> 緊急修理のバグ bug.
+	   (Fix #191, add video)
 
  参考：[History Version](https://github.com/FinalTeam/RxGalleryFinal/wiki/RxGalleryFinal-Version)
 
-### 1.1.2 特性
+### 1.1.1 の特性
 
- * Repair bug
- * Fix #175 #178
+ * 修復 のバグ bug
+ * #170,#165 ,#167 と#修正画像などのファイルまたはディレクトリはありません
+ * 最新版のサンプルコード
 
-### 1.1.1 Characteristic
+### 1.0.9 の特性
 
- * Repair bug
- * #170,#165 ,#167 and fix Image No such file or directory
- * Update Sample Code
+ * 修復のバグ bug -  #160
+ * ucrop設定の追加
+ * 最新版のサンプルコード
+ * rxjava更新
 
-### 1.0.9 Characteristic
-
- * Repair bug -  #160
- * Add UCROP setting
- * Update Sample Code
- * RxJava Update
-
-## Use
-### Download or add a dependency
+## 使用
+### をダウンロードするか、依存関係を追加
 
     compile 'cn.finalteam.rxgalleryfinal:library:1.1.2'
     compile 'com.android.support:recyclerview-v7:24.2.0'
     compile 'com.android.support:appcompat-v7:24.2.0'
 
-    //Supports the following image loader, mainstream developers to choose
+    //以下のイメージローダをサポートし、主流の開発者を選ぶ
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.facebook.fresco:fresco:0.12.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
@@ -61,43 +61,43 @@
 
 
 
-### Configuration Manifest
+### 構成を明らかにする
 
- screenshots：
+ スクリーンショット：
 
 ![image](https://github.com/FinalTeam/RxGalleryFinal/blob/master/screenshots/a1.png)
 
 
-* Provide the related Api
+* 関連のapiを提供する
 
-* Please check the MainActivity sample code :  [Sample code](https://github.com/FinalTeam/RxGalleryFinal/blob/master/sample/src/main/java/cn/finalteam/rxgalleryfinal/sample/MainActivity.java)
+* MainActivity サンプルコードをチェックしてください :  [Sample code](https://github.com/FinalTeam/RxGalleryFinal/blob/master/sample/src/main/java/cn/finalteam/rxgalleryfinal/sample/MainActivity.java)
 
 
 
-		   //The use of custom methods
+		   //またはカスタム手法の利用
 		   onClickZDListener();
-		   //Api call image selectors
+		   //さんの画像をセレクタapi呼び出し
 		   onClickSelImgListener();
-		   //Api call video selectors
+		   //さんのビデオセレクタapi呼び出し
 		   onClickSelVDListener();
-		   //Call cutting Api
+		   //切削apiに電話して
 		   onClickImgCropListener();
-		   //Manually open the log.
+		   //手動でログインします。
 		   ModelUtils.setDebugModel(true);
 
 
 
-* Here you can configure the theme
+* ここにあなたがテーマを設定することができます
 ![image](https://github.com/FinalTeam/RxGalleryFinal/blob/master/screenshots/device-2017-04-11-154816.png)
 
-##  Theme
+##  テーマ
 
-   Configuration Theme : sample -Res xml-> TestTheme..
+   テーマ：サンプル構成物のres -> xml→testtheme ....
 
-* Code
+* コード
 
 
-	//The radio of the custom method
+	//ラジオは、カスタムの方法
 	RxGalleryFinal
 	.with(context)
 	.image()
@@ -107,7 +107,7 @@
 	.subscribe(new RxBusResultSubscriber<ImageRadioResultEvent>() {
 	    @Override
 	    protected void onEvent(ImageRadioResultEvent imageRadioResultEvent) throws Exception {
-	        //图片选择结果Image selection results
+	        //画像選択の結果 Image selection results
 	        .....
 	    }
 	})
@@ -117,7 +117,7 @@
 ----
 
 
-	//The custom method multi-select
+	//カスタム方法マルチセレクト
 	RxGalleryFinal.with(MainActivity.this)
 	.image()
 	.multiple()
@@ -126,7 +126,7 @@
 	.subscribe(new RxBusResultSubscriber<ImageMultipleResultEvent>() {
 	       @Override
 	       protected void onEvent(ImageMultipleResultEvent imageMultipleResultEvent) throws Exception {
-	          toast("已选择" + imageMultipleResultEvent.getResult().size() + "张图片");
+	          toast("選択済み" + imageMultipleResultEvent.getResult().size() + "張画像");
 	       }
 	       @Override
 	       public void onCompleted() {
@@ -144,12 +144,12 @@
 	 RxGalleryListener.getInstance().setMultiImageCheckedListener(new IMultiImageCheckedListener() {
 	       @Override
 	       public void selectedImg(Object t, boolean isChecked) {
-	            //这个主要点击或者按到就会触发，所以不建议在这里进行Toast
+	            //この主なクリックや押しがトリガーので、提案しないここでトーストでした
 	            //The main click or press that will trigger, so it is not recommended to Toast here
 	       }
 	       @Override
 	       public void selectedImgMax(Object t, boolean isChecked, int maxSize) {
-	           toast("你最多只能选择" + maxSize + "张图片");
+	           toast("あなたが一番多いのは選択" + maxSize + "張画像");
 	       }
 	});
 
@@ -158,10 +158,10 @@
 
 	 //Interpretation
 	 RxGalleryFinal.with(context)
-	      .image()//图片
-	      .radio()//单选
-	      .crop()//裁剪
-	      .video()//视频
+	      .image()//画像
+	      .radio()//ラジオ
+	      .crop()//裁断
+	      .video()//ビデオ
 	      //Can choose the mainstream pictures inside:   PICASSO  GLIDE  FRESCO UNIVERSAL(ImageLoader)
 	      .imageLoader(ImageLoaderType.GLIDE)
 	      .subscribe(rxBusResultSubscriber)
@@ -170,24 +170,24 @@
 
 ----
 
-	    //调用裁剪.RxGalleryFinalApi.getModelPath()为默认的输出路径
+	    //裁断を呼び出す..RxGalleryFinalApi.getModelPath() デフォルトの出力経路
 	    //The output of the call cut .RxGalleryFinalApi.getModelPath() for the default path
 	    RxGalleryFinalApi.cropScannerForResult(MainActivity.this, RxGalleryFinalApi.getModelPath(), inputImg);
 
 ----
 
 
-	    //获取和设置 保存路径:Get and set path
+	    //セットと設定-保存経路:Get and set path
 	    //By cutting path
-	    RxGalleryFinalApi.getImgSaveRxCropDirByFile();//得到裁剪路径
-	    RxGalleryFinalApi.getImgSaveRxCropDirByStr();//得到裁剪路径
-	    //Get image path
-	    RxGalleryFinalApi.getImgSaveRxDirByFile();//得到图片路径
-	    RxGalleryFinalApi.getImgSaveRxCropDirByStr();//得到图片路径
+	    RxGalleryFinalApi.getImgSaveRxCropDirByFile();//裁断経路を得る
+	    RxGalleryFinalApi.getImgSaveRxCropDirByStr();//裁断経路を得る
+	    //画像のパスを取得する
+	    RxGalleryFinalApi.getImgSaveRxDirByFile();//写真を得る
+	    RxGalleryFinalApi.getImgSaveRxCropDirByStr();//写真を得る
 	
-	    //Get and set path
+	    //ゲットpath andセット
 	    //…… setImgSaveXXXXX().
-	    //图片自动会存储到下面，裁剪会自动生成路径；也可以手动设置裁剪的路径；
+	    //画像自動会ストレージの下、裁断を自動的に生成パスも手動設定裁断経路、
 	    //Will automatically stored in the pictures below,cut automatically generated path;
 	    //Can also manually cutting path;
 	    RxGalleryFinalApi.setImgSaveRxSDCard("dujinyang");
@@ -195,7 +195,7 @@
 ----
 
 
-	    //自定义裁剪Custom tailoring
+	    //カスタマイズ裁ち Custom tailoring
 	   rx.cropAspectRatioOptions(0, new AspectRatio("3:3",30, 10))
 	   .crop()
 	   .openGallery();
@@ -203,7 +203,7 @@
 ----
 
 
-	  //4.演示 单选裁剪 并且增加回掉 （裁剪必须在open之前）
+	  //4.デモンストレーションラジオ裁断そして増加回落ち（裁断しなければならないオープン前）
 	  RxGalleryFinalApi.getInstance(this)
 	     .onCrop(true)//是否裁剪
 	     .openGalleryRadioImgDefault(new RxBusResultSubscriber() {
@@ -310,16 +310,17 @@
 
 
 ## Q&A
-* 1、Pictures on problems, how to solve
-* 2、How to compress images
-* 3、Android 7.0 Flash back
-* 4、Authorized instructions
 
-## Contact
-   If there is an emergency can contact the Author or add QQ group:
-    - QQ Group： 218801658
-    - QQ Group： 246231638
-    - QQ:309933706
+* 1、問題について絵を解く方法
+* 2、画像を圧縮する方法
+* 3、Android 7.0 アンドロイド7 .フラッシュバック
+* 4、Authorized 認可された命令
+
+## Contact接触
+
+    緊急の著者に連絡してまたはqq群を加えることがあるならば：
+    - QQ Group群 ： 218801658
+    - QQ Group群 ： 246231638
 
 ## Wiki
 

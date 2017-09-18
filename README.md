@@ -6,6 +6,8 @@
    RxGalleryFinal是一个android图片/视频文件选择器。其支持多选、单选、拍摄和裁剪，主题可自定义，无强制绑定第三方图片加载器。
 
    * [English](https://github.com/FinalTeam/RxGalleryFinal/blob/master/README_English.md)
+   * [Japanese](https://github.com/FinalTeam/RxGalleryFinal/blob/master/README_Japanese.md)
+   * [Chinese](https://github.com/FinalTeam/RxGalleryFinal)
 
 ## 版本描述
 
@@ -18,13 +20,25 @@
 ### 待完善
 
     1.视频选择器的回调
-    2.卡顿测试，可在 Issues 里搜索：【精】觉得卡顿的点我 #130
+    2.卡顿问题，可在 Issues 里搜索： #130 【精】觉得卡顿的点我
 
 ### gradle
 
-	    New : compile 'cn.finalteam.rxgalleryfinal:library:1.1.0' -> 紧急修复bug.#161
+	    New : compile 'cn.finalteam.rxgalleryfinal:library:1.1.3' -> 紧急修复bug .
+	    (Fix #191, add video)
 
-        compile 'cn.finalteam.rxgalleryfinal:library:1.0.9'
+ 参考：[History Version](https://github.com/FinalTeam/RxGalleryFinal/wiki/RxGalleryFinal-Version)
+
+### 1.1.2 特性
+
+ * 修复相关bug
+ * Fix #175 #178
+
+### 1.1.1 特性
+
+ * 修复相关bug
+ * #170,#165 ,#167 and fix Image No such file or directory
+ * 更新Sample代码
 
 ### 1.0.9 特性
 
@@ -32,7 +46,6 @@
  * 增加UCROP的设置
  * 更新Sample代码
  * RxJava升级
- * [History Version](https://github.com/FinalTeam/RxGalleryFinal/wiki/RxGalleryFinal-Version)
 
 ## 使用
 ### 下载或添加依赖
