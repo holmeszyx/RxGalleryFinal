@@ -54,6 +54,7 @@ public class MediaScanner {
     }
 
     public void unScanFile() {
+        this.scanCallback = null;
         mediaScanConn.disconnect();
     }
 
