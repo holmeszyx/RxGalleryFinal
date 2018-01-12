@@ -236,7 +236,13 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         if (context instanceof MediaActivity) {
             mMediaActivity = (MediaActivity) context;
         }
-        mMediaScanner = new MediaScanner(context);
+
+        // media scan make the context leaked
+        final MediaScanner scanner = mMediaScanner;
+        if (scanner != null) {
+            scanner.unScanFile();
+        }
+        mMediaScanner = new MediaScanner(context.getApplicationContext());
     }
 
     @Override

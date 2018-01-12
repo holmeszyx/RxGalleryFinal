@@ -23,7 +23,7 @@ public class MediaScanner {
         client = new MusicSannerClient();
 
         if (mediaScanConn == null) {
-            mediaScanConn = new MediaScannerConnection(context, client);
+            mediaScanConn = new MediaScannerConnection(context.getApplicationContext(), client);
         }
     }
 
