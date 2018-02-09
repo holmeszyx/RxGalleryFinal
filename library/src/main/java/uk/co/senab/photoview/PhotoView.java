@@ -35,6 +35,9 @@ public class PhotoView extends FixImageView implements IPhotoView {
 
     private ScaleType mPendingScaleType;
 
+    private OnPhotoTapListener mOnPhotoTapListener;
+    private OnViewTapListener mOnViewTapListener;
+
     public PhotoView(Context context) {
         this(context, null);
     }
@@ -51,7 +54,12 @@ public class PhotoView extends FixImageView implements IPhotoView {
 
     protected void init() {
         if (null == mAttacher || null == mAttacher.getImageView()) {
+            final PhotoViewAttacher oldAttacher = mAttacher;
             mAttacher = new PhotoViewAttacher(this);
+
+            // restore listener
+            mAttacher.setOnPhotoTapListener(mOnPhotoTapListener);
+            mAttacher.setOnViewTapListener(mOnViewTapListener);
         }
 
         if (null != mPendingScaleType) {
@@ -246,6 +254,7 @@ public class PhotoView extends FixImageView implements IPhotoView {
 
     @Override
     public void setOnPhotoTapListener(OnPhotoTapListener listener) {
+        mOnPhotoTapListener = listener;
         mAttacher.setOnPhotoTapListener(listener);
     }
 
@@ -257,6 +266,7 @@ public class PhotoView extends FixImageView implements IPhotoView {
 
     @Override
     public void setOnViewTapListener(OnViewTapListener listener) {
+        mOnViewTapListener = listener;
         mAttacher.setOnViewTapListener(listener);
     }
 
